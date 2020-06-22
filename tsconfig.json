@@ -1,7 +1,10 @@
 {
-  "include": ["src"],
   "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true
-  }
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./dist"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "test"]
 }

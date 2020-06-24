@@ -263,6 +263,27 @@ describe('constructor', () => {
     }
   });
 
+  it('should throw an error if int padding is configured as end', () => {
+    try {
+      new FixedWidthParser([
+        {
+          type: 'int',
+          name: 'test',
+          width: 10,
+          start: 0,
+          padChar: '0',
+          padPosition: 'end',
+        },
+      ]);
+      fail('should have thrown an error');
+    } catch (err) {
+      expect(err.length).toBe(1);
+      expect(err[0].index).toBe(0);
+      expect(err[0].errors).toHaveLength(1);
+      expect(err[0].errors).toContainEqual('Cannot pad the end of numbers.');
+    }
+  });
+
   it('should throw an error if float is padded with non-zero number', () => {
     try {
       new FixedWidthParser([
@@ -280,6 +301,50 @@ describe('constructor', () => {
       expect(err[0].index).toBe(0);
       expect(err[0].errors).toHaveLength(1);
       expect(err[0].errors).toContainEqual("Cannot pad numbers with numbers other than '0'.");
+    }
+  });
+
+  it('should throw an error if float padding is configured as end', () => {
+    try {
+      new FixedWidthParser([
+        {
+          type: 'float',
+          name: 'test',
+          width: 10,
+          start: 0,
+          padChar: '0',
+          padPosition: 'end',
+        },
+      ]);
+      fail('should have thrown an error');
+    } catch (err) {
+      expect(err.length).toBe(1);
+      expect(err[0].index).toBe(0);
+      expect(err[0].errors).toHaveLength(1);
+      expect(err[0].errors).toContainEqual('Cannot pad the end of numbers.');
+    }
+  });
+
+  it('should throw an error if float config requests too many decimals than can fit in width', () => {
+    try {
+      new FixedWidthParser([
+        {
+          type: 'float',
+          name: 'test',
+          width: 10,
+          start: 0,
+          padChar: '0',
+          decimalCount: 11,
+        },
+      ]);
+      fail('should have thrown an error');
+    } catch (err) {
+      expect(err.length).toBe(1);
+      expect(err[0].index).toBe(0);
+      expect(err[0].errors).toHaveLength(1);
+      expect(err[0].errors).toContainEqual(
+        "Cannot have '11' decimals when field is only '10' char wide."
+      );
     }
   });
 });

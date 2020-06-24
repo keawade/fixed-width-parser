@@ -190,7 +190,9 @@ export class FixedWidthParser {
         if (trimmedString.includes('.')) {
           return Number(trimmedString);
         }
-        return Number(splice(trimmedString, '.', config.width - decimalCount));
+        // Pad to original field width with 0's to ensure decimal can be injected
+        const stringToParse = trimmedString.padStart(config.width, '0');
+        return Number(splice(stringToParse, '.', stringToParse.length - 1 - decimalCount));
       }
 
       case 'bool':
@@ -262,8 +264,18 @@ export class FixedWidthParser {
     switch (parseConfig.type) {
       case 'int':
       case 'float':
-        if (Number(parseConfig.padChar) > 0) {
+        if (/[1-9]/.test(parseConfig.padChar)) {
           errorResponse.errors.push(`Cannot pad numbers with numbers other than '0'.`);
+        }
+
+        if (parseConfig.padPosition === 'end') {
+          errorResponse.errors.push(`Cannot pad the end of numbers.`);
+        }
+
+        if (parseConfig.type === 'float' && parseConfig.decimalCount > parseConfig.width) {
+          errorResponse.errors.push(
+            `Cannot have '${parseConfig.decimalCount}' decimals when field is only '${parseConfig.width}' char wide.`
+          );
         }
         break;
 

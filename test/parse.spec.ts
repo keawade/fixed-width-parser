@@ -195,6 +195,94 @@ describe('FixedWidthParser.parse', () => {
     ]);
   });
 
+  it('should parse float segments with implicit decimal and leading # padding', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'float',
+        name: 'a',
+        width: 10,
+        start: 0,
+        padChar: '#',
+        padPosition: 'start',
+        decimalCount: 3,
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('####314159');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 314.159,
+      },
+    ]);
+  });
+
+  it('should parse float segments with implicit decimal and leading 0 padding', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'float',
+        name: 'a',
+        width: 10,
+        start: 0,
+        padChar: '0',
+        padPosition: 'start',
+        decimalCount: 3,
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('0000314159');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 314.159,
+      },
+    ]);
+  });
+
+  it('should parse float segments with more decimals than the length of the trimmed string', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'float',
+        name: 'a',
+        width: 10,
+        start: 0,
+        padChar: '0',
+        padPosition: 'start',
+        decimalCount: 3,
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('0000000009');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 0.009,
+      },
+    ]);
+  });
+
+  it('should parse float segments with decimals equal to the length of the width', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'float',
+        name: 'a',
+        width: 10,
+        start: 0,
+        padChar: '0',
+        padPosition: 'start',
+        decimalCount: 10,
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('0000000009');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 0.0000000009,
+      },
+    ]);
+  });
+
   it('should parse bool segments', () => {
     const fixedWidthParser = new FixedWidthParser([
       {

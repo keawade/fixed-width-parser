@@ -42,6 +42,7 @@
   "scripts": {
     "build": "tsc",
     "bump": "npm --no-git-tag-version version",
+    "prepublishOnly": "npm run build",
     "test": "jest --coverage",
     "test:watch": "npm run test -- --watch",
     "check": "npm run check:lint && npm run check:build",

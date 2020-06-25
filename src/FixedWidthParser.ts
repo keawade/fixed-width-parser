@@ -5,6 +5,8 @@ import { splice } from './splice';
 import { parse as parseToDate, isValid as isValidDate, format as formatDate } from 'date-fns';
 import { IUnparseOptions } from './interfaces/IUnparseOptions';
 import { trimString } from './trimString';
+import { IParseOptions } from './interfaces/IParseOptions';
+import { handleFalsyFallback } from './handleFalsyFallback';
 
 interface IFixedWidthParserOptions {
   /**
@@ -45,7 +47,12 @@ export class FixedWidthParser {
     }
   }
 
-  public parse(input: string): JsonObject[] {
+  public parse(input: string, options?: Partial<IParseOptions>): JsonObject[] {
+    options = {
+      falsyFallback: 'passthrough',
+      ...options,
+    };
+
     if (!input) {
       throw new Error('Invalid input! Input is empty!');
     }
@@ -56,7 +63,7 @@ export class FixedWidthParser {
 
     const lines = input.replace(/\r\n/g, '\n').split('\n');
 
-    return lines.map(this.parseLine);
+    return lines.map((line) => this.parseLine(line, options));
   }
 
   public unparse(input: unknown[], options?: Partial<IUnparseOptions>): string {
@@ -147,17 +154,18 @@ export class FixedWidthParser {
     return lines.join('\n');
   }
 
-  private parseLine = (line: string): JsonObject =>
+  private parseLine = (line: string, options: Partial<IParseOptions>): JsonObject =>
     this.parseConfigMap
       .map((config) => ({
         config,
         rawString: line.slice(config.start, config.start + config.width),
       }))
-      .reduce(this.parseLineSegments, {});
+      .reduce((acc, curr) => this.parseLineSegments(acc, curr, options), {});
 
   private parseLineSegments = (
     result: JsonObject,
-    segment: { config: ParseConfig; rawString: string }
+    segment: { config: ParseConfig; rawString: string },
+    options: Partial<IParseOptions>
   ): JsonObject => {
     if (!segment.config.name) {
       return result;
@@ -165,13 +173,14 @@ export class FixedWidthParser {
 
     return {
       ...result,
-      [segment.config.name]: this.parseSegment(segment.config, segment.rawString),
+      [segment.config.name]: this.parseSegment(segment.config, segment.rawString, options),
     };
   };
 
   private parseSegment = (
     config: ParseConfig,
-    rawString: string
+    rawString: string,
+    options: Partial<IParseOptions>
   ): string | number | boolean | undefined => {
     // Strip out padding
     const trimmedString = trimString(
@@ -182,20 +191,27 @@ export class FixedWidthParser {
 
     // Parse remaining string
     switch (config.type) {
-      case 'int':
-        return parseInt(trimmedString, config.radix ?? 10);
+      case 'int': {
+        return handleFalsyFallback(
+          parseInt(trimmedString, config.radix ?? 10),
+          options.falsyFallback
+        );
+      }
 
       case 'float': {
         const decimalCount = config.decimalCount ?? 2;
         if (trimmedString.includes('.')) {
-          return Number(trimmedString);
+          return handleFalsyFallback(Number(trimmedString), options.falsyFallback);
         }
         // Pad to original field width with 0's to ensure decimal can be injected
         const stringToParse = trimmedString.padStart(config.width, '0');
-        return Number(splice(stringToParse, '.', stringToParse.length - 1 - decimalCount));
+        return handleFalsyFallback(
+          Number(splice(stringToParse, '.', stringToParse.length - 1 - decimalCount)),
+          options.falsyFallback
+        );
       }
 
-      case 'bool':
+      case 'bool': {
         if (trimmedString === config.trueValue) {
           return true;
         }
@@ -203,8 +219,9 @@ export class FixedWidthParser {
           return false;
         }
 
-        console.warn('Failed to parse to boolean value. Defaulting to null.');
-        return null;
+        console.warn(`Failed to parse to boolean value. Falling back to ${options.falsyFallback}.`);
+        return handleFalsyFallback(false, options.falsyFallback);
+      }
 
       case 'date': {
         const parsedDate = parseToDate(trimmedString, config.fixedWidthFormat, new Date());
@@ -212,18 +229,21 @@ export class FixedWidthParser {
           return formatDate(parsedDate, config.jsonFormat);
         }
 
-        console.warn('Failed to parse to date value. Defaulting to null.');
-        return null;
+        const failValue = handleFalsyFallback(null, options.falsyFallback);
+        console.warn(`Failed to parse to date value. Falling back to ${failValue}.`);
+        return failValue;
       }
 
-      case 'skip':
+      case 'skip': {
         // handle skip with a name
         return undefined;
+      }
 
       case 'string':
-      default:
+      default: {
         // TODO: Find a good way to warn of untrimmed values as they may indicate a misconfiguration
-        return trimmedString;
+        return handleFalsyFallback(trimmedString, options.falsyFallback);
+      }
     }
   };
 
@@ -280,6 +300,8 @@ export class FixedWidthParser {
         break;
 
       case 'bool':
+        // TODO: Check paddingChar against true/false values?
+
         if (!parseConfig.trueValue) {
           errorResponse.errors.push(`Missing property 'trueValue'.`);
         }

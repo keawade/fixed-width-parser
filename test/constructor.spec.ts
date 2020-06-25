@@ -80,12 +80,12 @@ describe('constructor', () => {
             start: 0,
           },
         ],
-        { expectedFullWidth: 42 }
+        { expectedFullWidth: 42 },
       );
       fail('should have thrown an error');
     } catch (err) {
       expect(err.message).toBe(
-        'Calculated full width (2) does not match asserted full width (42)!'
+        'Calculated full width (2) does not match asserted full width (42)!',
       );
     }
   });
@@ -343,7 +343,7 @@ describe('constructor', () => {
       expect(err[0].index).toBe(0);
       expect(err[0].errors).toHaveLength(1);
       expect(err[0].errors).toContainEqual(
-        "Cannot have '11' decimals when field is only '10' char wide."
+        "Cannot have '11' decimals when field is only '10' char wide.",
       );
     }
   });

@@ -295,7 +295,7 @@ describe('FixedWidthParser.parse', () => {
       },
     ]);
 
-    const actual = fixedWidthParser.parse('y\nn\nq');
+    const actual = fixedWidthParser.parse('y\nn');
 
     expect(actual).toStrictEqual([
       {
@@ -303,9 +303,6 @@ describe('FixedWidthParser.parse', () => {
       },
       {
         a: false,
-      },
-      {
-        a: null,
       },
     ]);
   });
@@ -389,5 +386,342 @@ describe('FixedWidthParser.parse', () => {
         a: 'aaa',
       },
     ]);
+  });
+
+  describe('options', () => {
+    describe('falsyFallback', () => {
+      describe('falsyFallback = passthrough', () => {
+        it('should handle empty string fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'string',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'passthrough',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: '',
+            },
+          ]);
+        });
+
+        it('should handle empty int fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'int',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'passthrough',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: 0,
+            },
+          ]);
+        });
+
+        it('should handle empty float fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'float',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'passthrough',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: 0,
+            },
+          ]);
+        });
+
+        it('should handle empty date fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'date',
+              name: 'a',
+              width: 10,
+              start: 0,
+              fixedWidthFormat: 'yyyy-MM-dd',
+              jsonFormat: 'yyyy-MM-dd',
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'passthrough',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: null,
+            },
+          ]);
+        });
+
+        it('should handle empty bool fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'bool',
+              name: 'a',
+              width: 1,
+              start: 0,
+              trueValue: 'y',
+              falseValue: 'n',
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse(' ', {
+            falsyFallback: 'passthrough',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: false,
+            },
+          ]);
+        });
+      });
+
+      describe('falsyFallback = undefined', () => {
+        it('should handle empty string fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'string',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'undefined',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: undefined,
+            },
+          ]);
+        });
+
+        it('should handle empty int fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'int',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'undefined',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: undefined,
+            },
+          ]);
+        });
+
+        it('should handle empty float fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'float',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'undefined',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: undefined,
+            },
+          ]);
+        });
+
+        it('should handle empty date fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'date',
+              name: 'a',
+              width: 10,
+              start: 0,
+              fixedWidthFormat: 'yyyy-MM-dd',
+              jsonFormat: 'yyyy-MM-dd',
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'undefined',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: undefined,
+            },
+          ]);
+        });
+
+        it('should handle empty bool fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'bool',
+              name: 'a',
+              width: 1,
+              start: 0,
+              trueValue: 'y',
+              falseValue: 'n',
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse(' ', {
+            falsyFallback: 'undefined',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: undefined,
+            },
+          ]);
+        });
+      });
+
+      describe('falsyFallback = null', () => {
+        it('should handle empty string fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'string',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'null',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: null,
+            },
+          ]);
+        });
+
+        it('should handle empty int fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'int',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'null',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: null,
+            },
+          ]);
+        });
+
+        it('should handle empty float fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'float',
+              name: 'a',
+              width: 10,
+              start: 0,
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'null',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: null,
+            },
+          ]);
+        });
+
+        it('should handle empty date fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'date',
+              name: 'a',
+              width: 10,
+              start: 0,
+              fixedWidthFormat: 'yyyy-MM-dd',
+              jsonFormat: 'yyyy-MM-dd',
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse('          ', {
+            falsyFallback: 'null',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: null,
+            },
+          ]);
+        });
+
+        it('should handle empty bool fields', () => {
+          const fixedWidthParser = new FixedWidthParser([
+            {
+              type: 'bool',
+              name: 'a',
+              width: 1,
+              start: 0,
+              trueValue: 'y',
+              falseValue: 'n',
+            },
+          ]);
+
+          const actual = fixedWidthParser.parse(' ', {
+            falsyFallback: 'null',
+          });
+
+          expect(actual).toStrictEqual([
+            {
+              a: null,
+            },
+          ]);
+        });
+      });
+    });
   });
 });

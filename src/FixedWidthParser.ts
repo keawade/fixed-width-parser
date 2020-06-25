@@ -15,7 +15,7 @@ interface IFixedWidthParserOptions {
   expectedFullWidth?: number;
 }
 
-export class FixedWidthParser {
+export class FixedWidthParser<T extends JsonObject = JsonObject> {
   private parseConfigMap: ParseConfig[];
   private fullWidth: number;
 
@@ -47,7 +47,7 @@ export class FixedWidthParser {
     }
   }
 
-  public parse(input: string, options?: Partial<IParseOptions>): JsonObject[] {
+  public parse(input: string, options?: Partial<IParseOptions>): T[] {
     options = {
       falsyFallback: 'passthrough',
       ...options,
@@ -66,24 +66,24 @@ export class FixedWidthParser {
     return lines.map((line) => this.parseLine(line, options));
   }
 
-  public unparse(input: unknown[], options?: Partial<IUnparseOptions>): string {
+  public unparse(input: T[], options?: Partial<IUnparseOptions>): string {
     if (!input || input.length <= 0) {
       throw new Error('Invalid input! Input is empty!');
     }
 
-    const lines = input.map((obj) => {
+    const lines = input.map((record) => {
       let line = '';
 
       for (const config of this.parseConfigMap) {
         let value = '';
 
-        if (obj[config.name] === undefined || obj[config.name] === null) {
+        if (record[config.name] === undefined || record[config.name] === null) {
           value = '';
         } else {
           // Handle type specific conversion
           switch (config.type) {
             case 'float': {
-              const numAsStr: string = obj[config.name].toString();
+              const numAsStr: string = record[config.name].toString();
               const strippedDecimals = numAsStr.slice(
                 0,
                 numAsStr.indexOf('.') + (config.decimalCount ?? 2) + 1,
@@ -96,19 +96,23 @@ export class FixedWidthParser {
             }
 
             case 'int':
-              value = obj[config.name].toString(config.radix ?? 10);
+              value = record[config.name].toString(config.radix ?? 10);
               break;
 
             case 'string':
-              value = String(obj[config.name]);
+              value = String(record[config.name]);
               break;
 
             case 'bool':
-              value = obj[config.name] ? config.trueValue : config.falseValue;
+              value = record[config.name] ? config.trueValue : config.falseValue;
               break;
 
             case 'date': {
-              const parsedDate = parseToDate(obj[config.name], config.jsonFormat, new Date());
+              const parsedDate = parseToDate(
+                String(record[config.name]),
+                config.jsonFormat,
+                new Date(),
+              );
               if (isValidDate(parsedDate)) {
                 value = formatDate(parsedDate, config.fixedWidthFormat);
               }
@@ -154,19 +158,19 @@ export class FixedWidthParser {
     return lines.join('\n');
   }
 
-  private parseLine = (line: string, options: Partial<IParseOptions>): JsonObject =>
+  private parseLine = (line: string, options: Partial<IParseOptions>): T =>
     this.parseConfigMap
       .map((config) => ({
         config,
         rawString: line.slice(config.start, config.start + config.width),
       }))
-      .reduce((acc, curr) => this.parseLineSegments(acc, curr, options), {});
+      .reduce((acc, curr) => this.parseLineSegments(acc, curr, options), {} as T);
 
   private parseLineSegments = (
-    result: JsonObject,
+    result: T,
     segment: { config: ParseConfig; rawString: string },
     options: Partial<IParseOptions>,
-  ): JsonObject => {
+  ): T => {
     if (!segment.config.name) {
       return result;
     }

@@ -66,7 +66,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
     return lines.map((line) => this.parseLine(line, options));
   }
 
-  public unparse(input: T[], options?: Partial<IUnparseOptions>): string {
+  public unparse(input: unknown[], options?: Partial<IUnparseOptions>): string {
     if (!input || input.length <= 0) {
       throw new Error('Invalid input! Input is empty!');
     }

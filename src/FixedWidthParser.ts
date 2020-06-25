@@ -42,7 +42,7 @@ export class FixedWidthParser {
 
     if (options?.expectedFullWidth && this.fullWidth !== options.expectedFullWidth) {
       throw new Error(
-        `Calculated full width (${this.fullWidth}) does not match asserted full width (${options.expectedFullWidth})!`
+        `Calculated full width (${this.fullWidth}) does not match asserted full width (${options.expectedFullWidth})!`,
       );
     }
   }
@@ -86,7 +86,7 @@ export class FixedWidthParser {
               const numAsStr: string = obj[config.name].toString();
               const strippedDecimals = numAsStr.slice(
                 0,
-                numAsStr.indexOf('.') + (config.decimalCount ?? 2) + 1
+                numAsStr.indexOf('.') + (config.decimalCount ?? 2) + 1,
               );
               value =
                 config.insertDecimal ?? true
@@ -138,7 +138,7 @@ export class FixedWidthParser {
           console.warn(
             `Truncating value '${value}' to '${value.slice(0, config.width)}' to fit in '${
               config.name
-            }' width of '${config.width}'.`
+            }' width of '${config.width}'.`,
           );
 
           value = value.slice(0, config.width);
@@ -165,7 +165,7 @@ export class FixedWidthParser {
   private parseLineSegments = (
     result: JsonObject,
     segment: { config: ParseConfig; rawString: string },
-    options: Partial<IParseOptions>
+    options: Partial<IParseOptions>,
   ): JsonObject => {
     if (!segment.config.name) {
       return result;
@@ -180,13 +180,13 @@ export class FixedWidthParser {
   private parseSegment = (
     config: ParseConfig,
     rawString: string,
-    options: Partial<IParseOptions>
+    options: Partial<IParseOptions>,
   ): string | number | boolean | undefined => {
     // Strip out padding
     const trimmedString = trimString(
       rawString,
       config.padChar ?? ' ',
-      config.padPosition ?? 'start'
+      config.padPosition ?? 'start',
     );
 
     // Parse remaining string
@@ -194,7 +194,7 @@ export class FixedWidthParser {
       case 'int': {
         return handleFalsyFallback(
           parseInt(trimmedString, config.radix ?? 10),
-          options.falsyFallback
+          options.falsyFallback,
         );
       }
 
@@ -207,7 +207,7 @@ export class FixedWidthParser {
         const stringToParse = trimmedString.padStart(config.width, '0');
         return handleFalsyFallback(
           Number(splice(stringToParse, '.', stringToParse.length - 1 - decimalCount)),
-          options.falsyFallback
+          options.falsyFallback,
         );
       }
 
@@ -257,7 +257,7 @@ export class FixedWidthParser {
 
   private validateParseConfigs = (
     parseConfig: ParseConfig,
-    index: number
+    index: number,
   ): IParseConfigValidationError | undefined => {
     const errorResponse: IParseConfigValidationError = {
       index,
@@ -294,7 +294,7 @@ export class FixedWidthParser {
 
         if (parseConfig.type === 'float' && parseConfig.decimalCount > parseConfig.width) {
           errorResponse.errors.push(
-            `Cannot have '${parseConfig.decimalCount}' decimals when field is only '${parseConfig.width}' char wide.`
+            `Cannot have '${parseConfig.decimalCount}' decimals when field is only '${parseConfig.width}' char wide.`,
           );
         }
         break;

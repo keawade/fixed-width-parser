@@ -2,7 +2,7 @@ import { FalsyFallback } from './interfaces/IParseOptions';
 
 export const handleFalsyFallback = (
   value: string | number | false,
-  falsyFallback: FalsyFallback
+  falsyFallback: FalsyFallback,
 ): string | number | false | undefined | null => {
   if (!value && falsyFallback !== 'passthrough') {
     if (falsyFallback === 'undefined') {

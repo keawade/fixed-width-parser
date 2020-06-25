@@ -1,7 +1,7 @@
 export const trimString = (
   stringToTrim: string,
   charToRemove: string,
-  side: 'start' | 'end'
+  side: 'start' | 'end',
 ): string => {
   if (side === 'start') {
     while (stringToTrim.charAt(0) == charToRemove) {

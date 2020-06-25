@@ -208,7 +208,7 @@ describe('FixedWidthParser.unparse', () => {
       ],
       {
         truncate: true,
-      }
+      },
     );
 
     expect(actual).toStrictEqual('Alexand');
@@ -291,7 +291,7 @@ describe('FixedWidthParser.unparse', () => {
     ]);
 
     expect(actual).toStrictEqual(
-      '604d7d16-36be-47fd-ab70-e9c93b34c91f                        12345.12'
+      '604d7d16-36be-47fd-ab70-e9c93b34c91f                        12345.12',
     );
   });
 
@@ -319,7 +319,7 @@ describe('FixedWidthParser.unparse', () => {
     ]);
 
     expect(actual).toStrictEqual(
-      '604d7d16-36be-47fd-ab70-e9c93b34c91f                      12345.1234'
+      '604d7d16-36be-47fd-ab70-e9c93b34c91f                      12345.1234',
     );
   });
 
@@ -347,7 +347,7 @@ describe('FixedWidthParser.unparse', () => {
     ]);
 
     expect(actual).toStrictEqual(
-      '604d7d16-36be-47fd-ab70-e9c93b34c91f                         1234512'
+      '604d7d16-36be-47fd-ab70-e9c93b34c91f                         1234512',
     );
   });
 

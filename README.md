@@ -54,6 +54,21 @@ const result = fixedWidthParser.parse(input);
 ]
 ```
 
+#### Parse Options
+
+```typescript
+interface IParseOptions {
+  /**
+   * Value to return when value parses as falsy:
+   *
+   * - `'undefined'` = `undefined`
+   * - `'null'` = `null`
+   * - `'passthrough'` = return the original falsy value
+   */
+  falsyFallback: FalsyFallback;
+}
+```
+
 ### Unparse
 
 ```javascript

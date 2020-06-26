@@ -1,6 +1,9 @@
 # fixed-width-parser
 
 ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/keawade/fixed-width-parser/npm-publish/master)
+![npm](https://img.shields.io/npm/v/fixed-width-parser)
+![NPM](https://img.shields.io/npm/l/fixed-width-parser)
+![Snyk Vulnerabilities for npm package version](https://img.shields.io/snyk/vulnerabilities/npm/fixed-width-parser)
 
 `fixed-width-parser` is a node module for parsing data to and from fixed width string
 formats.

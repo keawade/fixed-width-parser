@@ -1,5 +1,7 @@
 # fixed-width-parser
 
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/keawade/fixed-width-parser/npm-publish/master)
+
 `fixed-width-parser` is a node module for parsing data to and from fixed width string
 formats.
 

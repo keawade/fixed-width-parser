@@ -319,8 +319,94 @@ describe('FixedWidthParser.unparse', () => {
     ]);
 
     expect(actual).toStrictEqual(
-      '604d7d16-36be-47fd-ab70-e9c93b34c91f                      12345.1234',
+      '604d7d16-36be-47fd-ab70-e9c93b34c91f                     12345.12340',
     );
+  });
+
+  it('should respect leading and trailing 0s', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'accountId',
+        start: 0,
+        width: 36,
+      },
+      {
+        padChar: '0',
+        padPosition: 'start',
+        type: 'float',
+        decimalCount: 3,
+        insertDecimal: false,
+        name: 'balance',
+        start: 36,
+        width: 5,
+      },
+    ]);
+
+    const actual = fixedWidthParser.unparse([
+      {
+        accountId: '604d7d16-36be-47fd-ab70-e9c93b34c91f',
+        balance: 5.5,
+      },
+    ]);
+
+    expect(actual).toStrictEqual('604d7d16-36be-47fd-ab70-e9c93b34c91f05500');
+  });
+
+  it('should not add extra trailing 0s', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'accountId',
+        start: 0,
+        width: 36,
+      },
+      {
+        padChar: '0',
+        padPosition: 'start',
+        type: 'float',
+        decimalCount: 3,
+        insertDecimal: false,
+        name: 'balance',
+        start: 36,
+        width: 5,
+      },
+    ]);
+
+    const actual = fixedWidthParser.unparse([
+      {
+        accountId: '604d7d16-36be-47fd-ab70-e9c93b34c91f',
+        balance: 5.555,
+      },
+    ]);
+
+    expect(actual).toStrictEqual('604d7d16-36be-47fd-ab70-e9c93b34c91f05555');
+  });
+
+  it('should default to a decimalCount of 2', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'accountId',
+        start: 0,
+        width: 36,
+      },
+      {
+        padChar: '0',
+        padPosition: 'start',
+        type: 'float',
+        insertDecimal: false,
+        name: 'balance',
+        start: 36,
+        width: 5,
+      },
+    ]);
+
+    const actual = fixedWidthParser.unparse([
+      {
+        accountId: '604d7d16-36be-47fd-ab70-e9c93b34c91f',
+        balance: 5.555,
+      },
+    ]);
+
+    expect(actual).toStrictEqual('604d7d16-36be-47fd-ab70-e9c93b34c91f00555');
   });
 
   it('should skip inserting decimal depending on config', () => {

@@ -84,10 +84,20 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
           switch (config.type) {
             case 'float': {
               const numAsStr: string = record[config.name].toString();
-              const strippedDecimals = numAsStr.slice(
+              let strippedDecimals = numAsStr.slice(
                 0,
                 numAsStr.indexOf('.') + (config.decimalCount ?? 2) + 1,
               );
+              // Add expected decimal places
+              const currentDecimals = strippedDecimals.slice(strippedDecimals.indexOf('.') + 1)
+                .length;
+              if (config.decimalCount > currentDecimals) {
+                const decimalsNeeded = config.decimalCount - currentDecimals;
+                strippedDecimals = strippedDecimals.padEnd(
+                  strippedDecimals.length + decimalsNeeded,
+                  '0',
+                );
+              }
               value =
                 config.insertDecimal ?? true
                   ? strippedDecimals

@@ -84,13 +84,21 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
           switch (config.type) {
             case 'float': {
               const numAsStr: string = record[config.name].toString();
+              // If the value not longer contains a decimal point
+              // (123.00 -> 123) assume the decimal point should be at the end.
+              const decimalIndex =
+                numAsStr.indexOf('.') > -1 ? numAsStr.indexOf('.') : numAsStr.length;
+
               let strippedDecimals = numAsStr.slice(
                 0,
-                numAsStr.indexOf('.') + (config.decimalCount ?? 2) + 1,
+                decimalIndex + (config.decimalCount ?? 2) + 1,
               );
               // Add expected decimal places
-              const currentDecimals = strippedDecimals.slice(strippedDecimals.indexOf('.') + 1)
-                .length;
+              const currentDecimals =
+                strippedDecimals.indexOf('.') > -1
+                  ? strippedDecimals.slice(strippedDecimals.indexOf('.') + 1).length
+                  : 0;
+
               if (config.decimalCount > currentDecimals) {
                 const decimalsNeeded = config.decimalCount - currentDecimals;
                 strippedDecimals = strippedDecimals.padEnd(
@@ -98,6 +106,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
                   '0',
                 );
               }
+
               value =
                 config.insertDecimal ?? true
                   ? strippedDecimals

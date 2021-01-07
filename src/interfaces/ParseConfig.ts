@@ -17,6 +17,7 @@ interface IBaseParseConfig {
   padPosition?: 'start' | 'end';
   padChar?: string;
   default?: string | number;
+  truncate?: boolean;
 }
 
 export interface ISkipParseConfig extends IBaseParseConfig {

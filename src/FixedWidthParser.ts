@@ -145,7 +145,10 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
 
         // Handle truncate or error
         if (value.length > config.width) {
-          if (!options?.truncate) {
+          // Prioritize config-level option over parser-level options
+          const shouldTruncate = config!.truncate ?? options!.truncate;
+
+          if (!shouldTruncate) {
             throw new Error(`Unable to parse value '${value}' into width of '${config.width}'!`);
           }
 

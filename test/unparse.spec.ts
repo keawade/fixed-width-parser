@@ -174,29 +174,45 @@ describe('FixedWidthParser.unparse', () => {
     expect(actual).toStrictEqual('00000001111what');
   });
 
-  it('should throw error if value cannot fit in defined width', () => {
+  // Truncation settings
+  // => errors
+  test.each([
+    [false, undefined],
+    [undefined, false],
+    [false, true],
+    [undefined, undefined],
+    [false, false],
+  ])('should throw an error if value cannot fit in defined width', (fieldLevel, parserLevel) => {
     const fixedWidthParser = new FixedWidthParser([
       {
         name: 'Name',
         start: 0,
         width: 7,
+        truncate: fieldLevel,
       },
     ]);
 
     try {
-      fixedWidthParser.unparse([{ Name: 'Alexander' }]);
+      fixedWidthParser.unparse([{ Name: 'Alexander' }], { truncate: parserLevel });
       fail('should have thrown error');
     } catch (err) {
       expect(err.message).toBe("Unable to parse value 'Alexander' into width of '7'!");
     }
   });
 
-  it('should optionally truncate values that are too long', () => {
+  // => truncation
+  test.each([
+    [true, undefined],
+    [true, false],
+    [undefined, true],
+    [true, true],
+  ])('should truncate values that are too long', (fieldLevel, parserLevel) => {
     const fixedWidthParser = new FixedWidthParser([
       {
         name: 'Name',
         start: 0,
         width: 7,
+        truncate: fieldLevel,
       },
     ]);
 
@@ -206,9 +222,7 @@ describe('FixedWidthParser.unparse', () => {
           Name: 'Alexander',
         },
       ],
-      {
-        truncate: true,
-      },
+      { truncate: parserLevel },
     );
 
     expect(actual).toStrictEqual('Alexand');

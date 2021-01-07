@@ -423,6 +423,35 @@ describe('FixedWidthParser.unparse', () => {
     expect(actual).toStrictEqual('604d7d16-36be-47fd-ab70-e9c93b34c91f00555');
   });
 
+  it('should respect decimalCount even when there is no decimal', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'accountId',
+        start: 0,
+        width: 36,
+      },
+      {
+        type: 'float',
+        name: 'balance',
+        start: 36,
+        width: 32,
+        decimalCount: 4,
+        insertDecimal: false,
+      },
+    ]);
+
+    const actual = fixedWidthParser.unparse([
+      {
+        accountId: '604d7d16-36be-47fd-ab70-e9c93b34c91f',
+        balance: 12345,
+      },
+    ]);
+
+    expect(actual).toStrictEqual(
+      '604d7d16-36be-47fd-ab70-e9c93b34c91f                       123450000',
+    );
+  });
+
   it('should skip inserting decimal depending on config', () => {
     const fixedWidthParser = new FixedWidthParser([
       {

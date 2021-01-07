@@ -104,7 +104,7 @@ const input = [
     age: 33,
     name: 'jeff',
   },
-]
+];
 
 const result = fixedWidthParser.unparse(input);
 ```
@@ -121,7 +121,9 @@ const result = fixedWidthParser.unparse(input);
 
 ```typescript
 interface IUnparseOptions {
-  // Allows truncating values that are too long instead of throwing
+  // Allows truncating values that are too long instead of throwing.
+  // This value can be overridden by the 'truncate' option in a parse config for
+  // each individual segment of text.
   // default: false
   truncate: boolean;
 }
@@ -151,12 +153,14 @@ interface IBaseParseConfig {
   padString?: string;
   // value to use when unparsing if field in input is undefined
   default?: string | number;
+  // default false; overrides the IUnparseOptions
+  truncate?: boolean;
 }
 ```
 
 An explicit `type` property can be provided in each parse config to specify what
 data types to use for values parsed from strings. Several of these data types require
-additional properties to be provided to fully define how parse/unparse values. 
+additional properties to be provided to fully define how parse/unparse values.
 
 ```typescript
 // Default config type

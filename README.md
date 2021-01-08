@@ -117,18 +117,6 @@ const result = fixedWidthParser.unparse(input);
 33        jeff
 ```
 
-### Unparse Options
-
-```typescript
-interface IUnparseOptions {
-  // Allows truncating values that are too long instead of throwing.
-  // This value can be overridden by the 'truncate' option in a parse config for
-  // each individual segment of text.
-  // default: false
-  truncate: boolean;
-}
-```
-
 ## Config
 
 When initializing a new instance of the `FixedWidthParser` class, you must provide
@@ -153,7 +141,7 @@ interface IBaseParseConfig {
   padString?: string;
   // value to use when unparsing if field in input is undefined
   default?: string | number;
-  // default false; overrides the IUnparseOptions
+  // overrides FixedWidthParser.defaults.truncate
   truncate?: boolean;
 }
 ```
@@ -254,9 +242,28 @@ interface IParseConfigValidationError {
 }
 ```
 
+## Parser Options
+
+```typescript
+interface IFixedWidthParserOptions {
+  // Allows truncating values that are too long instead of throwing.
+  //
+  // This value can be overridden by the 'truncate' option in individual parse configs.
+  // default: true
+  truncate?: boolean;
+  // If provided, enables an additional validation of the provided parse config
+  // map. If sum of all `width` values in the parse config map do not match this
+  // value, then the an error is thrown.
+  expectedFullWidth?: number;
+}
+```
+
 ## Thanks
 
 A huge thanks to @SteveyPugs for his work on `fixy` which served as inspiration
 for `fixed-width-parser`! `fixed-width-parser` started out as a fork of `fixy` and
 evolved into its own library when I got carried away and implemented a new high-level
 API.
+
+Another huge thanks to @wk-davis for her help with concept discussions and ongoing
+development help!

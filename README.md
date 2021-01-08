@@ -104,7 +104,7 @@ const input = [
     age: 33,
     name: 'jeff',
   },
-]
+];
 
 const result = fixedWidthParser.unparse(input);
 ```
@@ -115,16 +115,6 @@ const result = fixedWidthParser.unparse(input);
 42         bob
 21       alice
 33        jeff
-```
-
-### Unparse Options
-
-```typescript
-interface IUnparseOptions {
-  // Allows truncating values that are too long instead of throwing
-  // default: false
-  truncate: boolean;
-}
 ```
 
 ## Config
@@ -151,12 +141,14 @@ interface IBaseParseConfig {
   padString?: string;
   // value to use when unparsing if field in input is undefined
   default?: string | number;
+  // overrides FixedWidthParser.defaults.truncate
+  truncate?: boolean;
 }
 ```
 
 An explicit `type` property can be provided in each parse config to specify what
 data types to use for values parsed from strings. Several of these data types require
-additional properties to be provided to fully define how parse/unparse values. 
+additional properties to be provided to fully define how parse/unparse values.
 
 ```typescript
 // Default config type
@@ -250,9 +242,28 @@ interface IParseConfigValidationError {
 }
 ```
 
+## Parser Options
+
+```typescript
+interface IFixedWidthParserOptions {
+  // Allows truncating values that are too long instead of throwing.
+  //
+  // This value can be overridden by the 'truncate' option in individual parse configs.
+  // default: true
+  truncate?: boolean;
+  // If provided, enables an additional validation of the provided parse config
+  // map. If sum of all `width` values in the parse config map do not match this
+  // value, then the an error is thrown.
+  expectedFullWidth?: number;
+}
+```
+
 ## Thanks
 
 A huge thanks to @SteveyPugs for his work on `fixy` which served as inspiration
 for `fixed-width-parser`! `fixed-width-parser` started out as a fork of `fixy` and
 evolved into its own library when I got carried away and implemented a new high-level
 API.
+
+Another huge thanks to @wk-davis for her help with concept discussions and ongoing
+development help!

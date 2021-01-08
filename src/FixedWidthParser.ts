@@ -3,21 +3,19 @@ import { JsonObject } from './interfaces/json';
 import { IParseConfigValidationError } from './interfaces/IParseConfigValidationError';
 import { splice } from './splice';
 import { parse as parseToDate, isValid as isValidDate, format as formatDate } from 'date-fns';
-import { IUnparseOptions } from './interfaces/IUnparseOptions';
 import { trimString } from './trimString';
 import { IParseOptions } from './interfaces/IParseOptions';
 import { handleFalsyFallback } from './handleFalsyFallback';
-
-interface IFixedWidthParserOptions {
-  /**
-   * Will throw an error if config widths do not add up to this value.
-   */
-  expectedFullWidth?: number;
-}
+import { IFixedWidthParserOptions } from './interfaces/IFixedWidthParserOptions';
+import { IDefaults } from './interfaces/IDefaults';
 
 export class FixedWidthParser<T extends JsonObject = JsonObject> {
   private parseConfigMap: ParseConfig[];
   private fullWidth: number;
+  /**
+   * Default values of parameters used during parse and unparse.
+   */
+  public defaults: IDefaults;
 
   /**
    * @param parseConfigMap Array of parse configs
@@ -28,7 +26,9 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
       throw new Error(`Invalid parse config! Parse config is empty!`);
     }
 
-    this.parseConfigMap = parseConfigMap.sort((a, b) => a.start - b.start).map(this.applyDefaults);
+    this.parseConfigMap = parseConfigMap
+      .sort((a, b) => a.start - b.start)
+      .map(this.applyDefaultType);
 
     const validationErrors = this.parseConfigMap
       .map(this.validateParseConfigs)
@@ -45,6 +45,10 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
         `Calculated full width (${this.fullWidth}) does not match asserted full width (${options.expectedFullWidth})!`,
       );
     }
+
+    this.defaults = {
+      truncate: options?.truncate ?? true,
+    };
   }
 
   public parse(input: string, options?: Partial<IParseOptions>): T[] {
@@ -66,7 +70,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
     return lines.map((line) => this.parseLine(line, options));
   }
 
-  public unparse(input: unknown[], options?: Partial<IUnparseOptions>): string {
+  public unparse(input: unknown[]): string {
     if (!input || input.length <= 0) {
       throw new Error('Invalid input! Input is empty!');
     }
@@ -154,7 +158,8 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
 
         // Handle truncate or error
         if (value.length > config.width) {
-          if (!options?.truncate) {
+          // Prioritize config-level option over parser-level options
+          if (!(config.truncate ?? this.defaults.truncate)) {
             throw new Error(`Unable to parse value '${value}' into width of '${config.width}'!`);
           }
 
@@ -270,7 +275,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
     }
   };
 
-  private applyDefaults = (parseConfig: ParseConfigInput): ParseConfig => {
+  private applyDefaultType = (parseConfig: ParseConfigInput): ParseConfig => {
     if (!parseConfig.type) {
       parseConfig.type = 'string';
     }

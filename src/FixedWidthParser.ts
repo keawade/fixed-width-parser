@@ -8,10 +8,17 @@ import { IParseOptions } from './interfaces/IParseOptions';
 import { handleFalsyFallback } from './handleFalsyFallback';
 import { IFixedWidthParserOptions } from './interfaces/IFixedWidthParserOptions';
 import { IDefaults } from './interfaces/IDefaults';
+import { ICharacterWhitelist } from './interfaces/ICharacterWhitelist';
+import { filterCharacters } from './filterCharacters';
 
 export class FixedWidthParser<T extends JsonObject = JsonObject> {
   private parseConfigMap: ParseConfig[];
   private fullWidth: number;
+  /**
+   * Specifies if only certain characters should be allowed, and if so, which
+   * ones; all other characters are removed. All characters are allowed by default.
+   */
+  private characterWhitelist: ICharacterWhitelist;
   /**
    * Default values of parameters used during parse and unparse.
    */
@@ -49,6 +56,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
     this.defaults = {
       truncate: options?.truncate ?? true,
     };
+    this.characterWhitelist = options?.characterWhitelist;
   }
 
   public parse(input: string, options?: Partial<IParseOptions>): T[] {
@@ -210,13 +218,14 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
     rawString: string,
     options: Partial<IParseOptions>,
   ): string | number | boolean | undefined => {
+    const filteredString = filterCharacters(rawString, this.characterWhitelist);
+
     // Strip out padding
     const trimmedString = trimString(
-      rawString,
+      filteredString,
       config.padChar ?? ' ',
       config.padPosition ?? 'start',
     );
-
     // Parse remaining string
     switch (config.type) {
       case 'int': {

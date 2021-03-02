@@ -388,6 +388,132 @@ describe('FixedWidthParser.parse', () => {
     ]);
   });
 
+  it('should parse string segment and leave the specified characters', () => {
+    const fixedWidthParser = new FixedWidthParser(
+      [
+        {
+          name: 'a',
+          width: 18,
+          start: 0,
+          padChar: '0',
+        },
+      ],
+      {
+        characterWhitelist: {
+          special: false,
+          extendedCharacters: false,
+          other: [' '],
+        },
+      },
+    );
+
+    const actual = fixedWidthParser.parse('   ヶ丘２丁?�ABC\u0000');
+
+    expect(actual).toStrictEqual([
+      {
+        a: '   ABC',
+      },
+    ]);
+  });
+
+  it('should parse float segment after removing alphabetic characters', () => {
+    const fixedWidthParser = new FixedWidthParser(
+      [
+        {
+          type: 'float',
+          name: 'a',
+          width: 10,
+          start: 0,
+          padChar: '0',
+          padPosition: 'start',
+          decimalCount: 10,
+        },
+      ],
+      { characterWhitelist: { alpha: false } },
+    );
+
+    const actual = fixedWidthParser.parse('A000B0009C');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 0.0000000009,
+      },
+    ]);
+  });
+
+  it('should parse int segment after removing special characters', () => {
+    const fixedWidthParser = new FixedWidthParser(
+      [
+        {
+          type: 'int',
+          name: 'a',
+          width: 4,
+          start: 0,
+        },
+      ],
+      { characterWhitelist: { special: false } },
+    );
+
+    const actual = fixedWidthParser.parse(' 0.1');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 1,
+      },
+    ]);
+  });
+
+  it('should parse bool segment after removing numeric characters', () => {
+    const fixedWidthParser = new FixedWidthParser(
+      [
+        {
+          type: 'bool',
+          name: 'a',
+          width: 3,
+          start: 0,
+          trueValue: 'y',
+          falseValue: 'n',
+        },
+      ],
+      { characterWhitelist: { numeric: false } },
+    );
+
+    const actual = fixedWidthParser.parse('01y');
+
+    expect(actual).toStrictEqual([
+      {
+        a: true,
+      },
+    ]);
+  });
+
+  it('should parse date segment after removing non-printable ASCII characters', () => {
+    const fixedWidthParser = new FixedWidthParser(
+      [
+        {
+          type: 'date',
+          name: 'a',
+          width: 11,
+          start: 0,
+          jsonFormat: 'yyyy_MM_dd',
+          fixedWidthFormat: 'yyyyMMdd',
+        },
+      ],
+      { characterWhitelist: { extendedCharacters: false } },
+    );
+
+    const actual = fixedWidthParser.parse('2020�06�21�\nnotvalid');
+
+    expect(actual).toStrictEqual([
+      {
+        a: '2020_06_21',
+      },
+      {
+        a: null,
+      },
+    ]);
+  });
+
   describe('options', () => {
     describe('falsyFallback', () => {
       describe('falsyFallback = passthrough', () => {

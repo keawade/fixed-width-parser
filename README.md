@@ -255,7 +255,35 @@ interface IFixedWidthParserOptions {
   // map. If sum of all `width` values in the parse config map do not match this
   // value, then the an error is thrown.
   expectedFullWidth?: number;
+  // Specifies if only certain characters should be allowed, and if so, which
+  // ones; all other characters are removed.
+  // default: undefined - which allows all characters
+  characterWhitelist?: ICharacterWhitelist;
 }
+```
+
+### Character Whitelist
+
+```typescript
+  // Allow upper and lower case characters from the Latin alphabet:
+  // AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz
+  alpha?: boolean;
+  // Allow the ten digits:
+  // 1234567890
+  numeric?: boolean;
+  // Allow commonly used punctuation and symbols including spaces (' ')
+  // ~ `!@#$%^&*()-_=+{}[]\|/?:;'"<>,.
+  special?: boolean;
+  // Allow other characters beyond the Basic Latin Unicode block such as
+  // - control characters: \u0000 \f �
+  // - emojis 😀 🎉 🚀
+  // - other symbols and special characters: ⍺è¶
+  extendedCharacters?: boolean;
+  // Allow each character in the given array. Each item should include only 1 character.
+  // The characters listed here take priority over other options, for example, if
+  // numeric characters are not allowed, but 0 is in the list of 'other' 
+  // characters, all numeric characters will be omitted except 0. 
+  other?: string[];
 ```
 
 ## Thanks

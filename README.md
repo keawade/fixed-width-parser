@@ -278,11 +278,11 @@ interface IFixedWidthParserOptions {
   // - control characters: \u0000 \f �
   // - emojis 😀 🎉 🚀
   // - other symbols and special characters: ⍺è¶
-  extendedCharacters?: boolean;
+  extended?: boolean;
   // Allow each character in the given array. Each item should include only 1 character.
   // The characters listed here take priority over other options, for example, if
-  // numeric characters are not allowed, but 0 is in the list of 'other' 
-  // characters, all numeric characters will be omitted except 0. 
+  // numeric characters are not allowed, but 0 is in the list of 'other'
+  // characters, all numeric characters will be omitted except 0.
   other?: string[];
 ```
 

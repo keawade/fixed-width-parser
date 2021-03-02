@@ -401,7 +401,7 @@ describe('FixedWidthParser.parse', () => {
       {
         characterWhitelist: {
           special: false,
-          extendedCharacters: false,
+          extended: false,
           other: [' '],
         },
       },
@@ -499,7 +499,7 @@ describe('FixedWidthParser.parse', () => {
           fixedWidthFormat: 'yyyyMMdd',
         },
       ],
-      { characterWhitelist: { extendedCharacters: false } },
+      { characterWhitelist: { extended: false } },
     );
 
     const actual = fixedWidthParser.parse('2020�06�21�\nnotvalid');

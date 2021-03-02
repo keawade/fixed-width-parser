@@ -11,7 +11,7 @@ export function filterCharacters(
     characterWhitelist.special !== false &&
     characterWhitelist.alpha !== false &&
     characterWhitelist.numeric !== false &&
-    characterWhitelist.extendedCharacters !== false
+    characterWhitelist.extended !== false
   ) {
     return rawString;
   }
@@ -47,7 +47,7 @@ export function filterCharacters(
     // This string identifies the characters to keep. If a character is
     // whitelisted in the 'other' property, then it should be added to this
     // string to preserve it in the output
-    extendedCharacters: '^ -~' + otherWhitelist,
+    extended: '^ -~' + otherWhitelist,
     // The following strings identify the characters to remove. If a character
     // is whitelisted in the 'other' property, then it should be removed from
     // these strings to preserve it in the output

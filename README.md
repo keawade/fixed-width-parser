@@ -25,10 +25,12 @@ const fixedWidthParser = new FixedWidthParser([
   {
     type: 'int',
     name: 'age',
+    start: 0,
     width: 2,
   },
   {
     name: 'name',
+    start: 2,
     width: 12,
   },
 ]);
@@ -83,10 +85,12 @@ const fixedWidthParser = new FixedWidthParser([
   {
     type: 'int',
     name: 'age',
+    start: 0,
     width: 2,
   },
   {
     name: 'name',
+    start: 2,
     width: 12,
   },
 ]);

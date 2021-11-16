@@ -116,6 +116,26 @@ describe('FixedWidthParser.parse', () => {
     ]);
   });
 
+  it('should parse int segments with falsyFallBack options', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'int',
+        name: 'a',
+        width: 2,
+        start: 0,
+        falsyFallback: 'passthrough',
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse(' 1');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 1,
+      },
+    ]);
+  });
+
   it('should respect radix', () => {
     const fixedWidthParser = new FixedWidthParser([
       {
@@ -144,6 +164,27 @@ describe('FixedWidthParser.parse', () => {
         width: 7,
         start: 0,
         decimalCount: 5,
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('3.14159');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 3.14159,
+      },
+    ]);
+  });
+
+  it('should parse float segments with falsyFallback options', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'float',
+        name: 'a',
+        width: 7,
+        start: 0,
+        decimalCount: 5,
+        falsyFallback: 'passthrough',
       },
     ]);
 
@@ -227,6 +268,29 @@ describe('FixedWidthParser.parse', () => {
         padChar: '0',
         padPosition: 'start',
         decimalCount: 3,
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('0000314159');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 314.159,
+      },
+    ]);
+  });
+
+  it('should parse float segments with implicit decimal and leading 0 padding with falsyFallback options', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'float',
+        name: 'a',
+        width: 10,
+        start: 0,
+        padChar: '0',
+        padPosition: 'start',
+        decimalCount: 3,
+        falsyFallback: 'undefined',
       },
     ]);
 
@@ -331,6 +395,31 @@ describe('FixedWidthParser.parse', () => {
     ]);
   });
 
+  it('should parse date segments with falsyFallback options', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'date',
+        name: 'a',
+        width: 8,
+        start: 0,
+        jsonFormat: 'yyyy_MM_dd',
+        fixedWidthFormat: 'yyyyMMdd',
+        falsyFallback: 'undefined',
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('20200621\nnotvalid');
+
+    expect(actual).toStrictEqual([
+      {
+        a: '2020_06_21',
+      },
+      {
+        a: undefined,
+      },
+    ]);
+  });
+
   it('should remove padding', () => {
     const fixedWidthParser = new FixedWidthParser([
       {
@@ -396,6 +485,35 @@ describe('FixedWidthParser.parse', () => {
           width: 18,
           start: 0,
           padChar: '0',
+        },
+      ],
+      {
+        characterWhitelist: {
+          special: false,
+          extended: false,
+          other: [' '],
+        },
+      },
+    );
+
+    const actual = fixedWidthParser.parse('   ヶ丘２丁?�ABC\u0000');
+
+    expect(actual).toStrictEqual([
+      {
+        a: '   ABC',
+      },
+    ]);
+  });
+
+  it('should parse string segment and leave the specified characters', () => {
+    const fixedWidthParser = new FixedWidthParser(
+      [
+        {
+          name: 'a',
+          width: 18,
+          start: 0,
+          padChar: '0',
+          falsyFallback: 'undefined',
         },
       ],
       {
@@ -483,6 +601,31 @@ describe('FixedWidthParser.parse', () => {
     expect(actual).toStrictEqual([
       {
         a: true,
+      },
+    ]);
+  });
+
+  it('should parse bool segment after removing numeric characters with falsyFallback options', () => {
+    const fixedWidthParser = new FixedWidthParser(
+      [
+        {
+          type: 'bool',
+          name: 'a',
+          width: 3,
+          start: 0,
+          trueValue: 'y',
+          falseValue: 'n',
+          falsyFallback: 'undefined',
+        },
+      ],
+      { characterWhitelist: { numeric: false } },
+    );
+
+    const actual = fixedWidthParser.parse('01');
+
+    expect(actual).toStrictEqual([
+      {
+        a: undefined,
       },
     ]);
   });

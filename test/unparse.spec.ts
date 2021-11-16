@@ -618,7 +618,7 @@ describe('FixedWidthParser.unparse', () => {
     expect(actual).toStrictEqual('a');
   });
 
-  it('should floor an int type when not given an int', () => {
+  it('should floor an int type when not given a mending method', () => {
     const fixedWidthParser = new FixedWidthParser([
       {
         name: 'Age',
@@ -643,5 +643,101 @@ describe('FixedWidthParser.unparse', () => {
       },
     ]);
     expect(actual).toBe('      3 SJP\n     20 CCS');
+  });
+
+  it('should ceil an int type when given a mend of ceil', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'Money',
+        start: 0,
+        width: 7,
+        type: 'int',
+        mend: 'ceil',
+        radix: 10,
+      },
+    ]);
+    const actual = fixedWidthParser.unparse([
+      {
+        Money: 312.45,
+      },
+    ]);
+    expect(actual).toBe('    313');
+  });
+
+  it('should round an int type when given round as a mending type', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'Money',
+        start: 0,
+        width: 7,
+        type: 'int',
+        mend: 'round',
+        radix: 10,
+      },
+    ]);
+    const actual = fixedWidthParser.unparse([
+      {
+        Money: 312.45,
+      },
+    ]);
+    expect(actual).toBe('    312');
+  });
+
+  it('should respect multiple mending types', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'Money',
+        start: 0,
+        width: 3,
+        type: 'int',
+        mend: 'round',
+        radix: 10,
+      },
+      {
+        name: 'Yuan',
+        start: 3,
+        width: 3,
+        type: 'int',
+        mend: 'floor',
+        radix: 10,
+      },
+      {
+        name: 'Won',
+        start: 6,
+        width: 3,
+        type: 'int',
+        mend: 'ceil',
+        radix: 10,
+      },
+    ]);
+    const actual = fixedWidthParser.unparse([
+      {
+        Money: 312.45,
+        Yuan: 313.67,
+        Won: 421.9,
+      },
+    ]);
+    expect(actual).toBe('312313422');
+  });
+
+  it('should throw an error when the mend type is error for an int', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'Money',
+        start: 0,
+        width: 7,
+        type: 'int',
+        mend: 'error',
+      },
+    ]);
+    try {
+      fixedWidthParser.unparse([
+        {
+          Money: 312.45,
+        },
+      ]);
+    } catch (error) {
+      expect(error.message).toBeDefined();
+    }
   });
 });

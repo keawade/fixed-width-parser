@@ -33,7 +33,7 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.21.2",
-    "husky": "3.1.0",
+    "husky": "^7.0.4",
     "jest": "^26.1.0",
     "prettier": "^2.0.5",
     "ts-jest": "^26.1.1",
@@ -45,12 +45,17 @@
     "prepublishOnly": "npm run build",
     "test": "jest --coverage",
     "test:watch": "npm run test -- --watch",
-    "check": "npm run check:lint && npm run check:build",
+    "check": "npm run check:lint && npm run check:prettier && npm run check:build",
     "check:build": "tsc --noEmit",
-    "check:lint": "eslint src/** test/**"
+    "check:lint": "eslint src/** test/**",
+    "check:prettier": "prettier \"{.,,{src,test}/**/}*.@(ts)\" --list-different",
+    "husky:pre-commit": "npm run check",
+    "husky:pre-push": "npm run test",
+    "prepare": "husky install"
   },
   "keywords": [
     "fixed",
+    "fixed width",
     "format",
     "parser"
   ]

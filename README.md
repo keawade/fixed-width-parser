@@ -290,6 +290,37 @@ interface IFixedWidthParserOptions {
   other?: string[];
 ```
 
+## Parser Logger
+
+By default any logs from the parser will be handled by the built in `console` logger.
+You can optionally provide your own `ILogger` compatible logger to process logs.
+
+```typescript
+const { FixedWidthParser, ILogger } = require('fixed-width-parser');
+
+const myLogger: ILogger = {
+  warn: (...data: any[]) => console.warn(data);
+}
+
+const fixedWidthParser = new FixedWidthParser(
+  [
+    {
+      type: 'int',
+      name: 'age',
+      start: 0,
+      width: 2,
+    },
+    {
+      name: 'name',
+      start: 2,
+      width: 12,
+    },
+  ],
+  undefined, // options
+  myLogger, // Default: console
+);
+```
+
 ## Thanks
 
 A huge thanks to @SteveyPugs for his work on `fixy` which served as inspiration

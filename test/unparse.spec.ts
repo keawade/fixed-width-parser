@@ -617,4 +617,34 @@ describe('FixedWidthParser.unparse', () => {
 
     expect(actual).toStrictEqual('a');
   });
+
+  it('should throw an error if an int value is not an int', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        name: 'Age',
+        start: 0,
+        width: 7,
+        type: 'int',
+      },
+      {
+        name: 'Initial',
+        start: 7,
+        width: 4,
+      },
+    ]);
+    try {
+      fixedWidthParser.unparse([
+        {
+          Age: 3.10,
+          Initial: 'SJP',
+        },
+        {
+          Age: 20,
+          Initial: 'CCS',
+        },
+      ]);
+    } catch (error) {
+      expect(error.message).toBe("Int value was not an int")
+    }
+  });
 });

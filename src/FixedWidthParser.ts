@@ -132,6 +132,11 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
             }
 
             case 'int':
+              // Don't assume that the value is an int.
+              const truncatedValue: number = parseInt(record[config.name].toString());
+              if(truncatedValue != record[config.name]){
+                throw new Error('Int value was not an int');
+              }
               value = record[config.name].toString(config.radix ?? 10);
               break;
 

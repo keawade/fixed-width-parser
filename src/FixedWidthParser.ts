@@ -127,6 +127,11 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
             }
 
             case 'int':
+              // Don't assume that the value is an int.
+              const truncatedValue: number = parseInt(record[config.name].toString());
+              if(truncatedValue != record[config.name]){
+                throw new Error('Int value was not an int');
+              }
               value = record[config.name].toString(config.radix ?? 10);
               break;
 
@@ -171,11 +176,11 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
             throw new Error(`Unable to parse value '${value}' into width of '${config.width}'!`);
           }
 
-          console.warn(
-            `Truncating value '${value}' to '${value.slice(0, config.width)}' to fit in '${
-              config.name
-            }' width of '${config.width}'.`,
-          );
+          // console.warn(
+          //   `Truncating value '${value}' to '${value.slice(0, config.width)}' to fit in '${
+          //     config.name
+          //   }' width of '${config.width}'.`,
+          // );
 
           value = value.slice(0, config.width);
         }
@@ -256,7 +261,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
           return false;
         }
 
-        console.warn(`Failed to parse to boolean value. Falling back to ${options.falsyFallback}.`);
+        //console.warn(`Failed to parse to boolean value. Falling back to ${options.falsyFallback}.`);
         return handleFalsyFallback(false, options.falsyFallback);
       }
 
@@ -267,7 +272,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
         }
 
         const failValue = handleFalsyFallback(null, options.falsyFallback);
-        console.warn(`Failed to parse to date value. Falling back to ${failValue}.`);
+        //console.warn(`Failed to parse to date value. Falling back to ${failValue}.`);
         return failValue;
       }
 

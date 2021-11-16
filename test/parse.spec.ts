@@ -665,7 +665,7 @@ describe('FixedWidthParser.parse', () => {
 
           expect(actual).toStrictEqual([
             {
-              a: 0,
+              a: undefined,
             },
           ]);
         });
@@ -776,7 +776,7 @@ describe('FixedWidthParser.parse', () => {
 
           expect(actual).toStrictEqual([
             {
-              a: 0,
+              a: null,
             },
           ]);
         });

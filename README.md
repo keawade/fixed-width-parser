@@ -147,8 +147,9 @@ interface IBaseParseConfig {
   default?: string | number;
   // overrides FixedWidthParser.defaults.truncate
   truncate?: boolean;
-  // value to return when value parses as falsy
-  falsyFallback?: FalsyFallback
+  // value to return if the parsed value is falsy
+  // default: IParseOptions.falsyFallback value
+  falsyFallback?: 'undefined' | 'null' | 'passthrough'
 }
 ```
 

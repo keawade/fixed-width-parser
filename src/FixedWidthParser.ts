@@ -267,10 +267,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
         } else {
           value = parseInt(trimmedString, config.radix);
         }
-        return handleFalsyFallback(
-          parseInt(trimmedString, config.radix ?? 10),
-          config.falsyFallback ?? options.falsyFallback,
-        );
+        return handleFalsyFallback(value, config.falsyFallback ?? options.falsyFallback);
       }
 
       case 'float': {

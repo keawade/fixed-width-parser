@@ -174,6 +174,15 @@ interface IIntegerParseConfig {
   // integer between 2 and 36 that represents the radix of the string
   // default: 10
   radix?: number;
+  // When parsing and unparsing, there may be an error that the value given is not
+  // an integer. This is a way of the parser to work around this issue. Give an option here
+  // to have the parser do the following when encountering a non-int as an int-type
+  // ceil: performs Math.ceil() on the data
+  // floor: performs Math.floor() on the data
+  // round: performs Math.round() on the data
+  // error: Will throw an error if the data is not an int
+  // default: floor
+  mend?: 'ceil' | 'floor' | 'round' | 'error'
 }
 ```
 

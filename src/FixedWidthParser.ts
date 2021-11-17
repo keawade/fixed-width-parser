@@ -132,7 +132,21 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
             }
 
             case 'int':
-              value = record[config.name].toString(config.radix ?? 10);
+              // Don't assume that the value is an int.
+              switch (config.mend) {
+                case 'ceil':
+                  value = Math.ceil(record[config.name]).toString(10);
+                  break;
+                case 'round':
+                  value = Math.round(record[config.name]).toString(10);
+                  break;
+                case 'error':
+                  throw new Error(`Expected parsed value for '${config.name}' to be an integer`);
+                case 'floor':
+                default:
+                  value = Math.floor(record[config.name]).toString(config.radix ?? 10);
+                  break;
+              }
               break;
 
             case 'string':
@@ -234,10 +248,26 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
     // Parse remaining string
     switch (config.type) {
       case 'int': {
-        return handleFalsyFallback(
-          parseInt(trimmedString, config.radix ?? 10),
-          options.falsyFallback,
-        );
+        let value: number;
+        if (!config.radix || config.radix === 10) {
+          switch (config.mend) {
+            case 'ceil':
+              value = Math.ceil(parseFloat(trimmedString));
+              break;
+            case 'round':
+              value = Math.round(parseFloat(trimmedString));
+              break;
+            case 'error':
+              throw new Error(`Expected parsed value for '${config.name}' to be an integer`);
+            case 'floor':
+            default:
+              value = parseInt(trimmedString);
+              break;
+          }
+        } else {
+          value = parseInt(trimmedString, config.radix);
+        }
+        return handleFalsyFallback(value, options.falsyFallback);
       }
 
       case 'float': {
@@ -339,6 +369,18 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
         if (parseConfig.type === 'float' && parseConfig.decimalCount > parseConfig.width) {
           errorResponse.errors.push(
             `Cannot have '${parseConfig.decimalCount}' decimals when field is only '${parseConfig.width}' char wide.`,
+          );
+        }
+
+        if (
+          parseConfig.type === 'int' &&
+          parseConfig.radix &&
+          parseConfig.radix !== 10 &&
+          parseConfig.mend &&
+          parseConfig.mend !== 'error'
+        ) {
+          errorResponse.errors.push(
+            `Cannot have a radix of '${parseConfig.radix} with any sort of rounding solution.`,
           );
         }
         break;

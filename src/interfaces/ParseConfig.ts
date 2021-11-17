@@ -33,6 +33,7 @@ export interface IIntegerParseConfig extends IBaseParseConfig {
   type: 'int';
   name: string;
   radix?: number;
+  mend?: 'floor' | 'ceil' | 'round' | 'error';
 }
 
 export interface IFloatParseConfig extends IBaseParseConfig {

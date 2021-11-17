@@ -514,6 +514,99 @@ describe('FixedWidthParser.parse', () => {
     ]);
   });
 
+  it('should respect mending type of ceil', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'int',
+        name: 'a',
+        width: 3,
+        start: 0,
+        mend: 'ceil',
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('1.6');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 2,
+      },
+    ]);
+  });
+
+  it('should respect mending type of round', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'int',
+        name: 'a',
+        width: 3,
+        start: 0,
+        mend: 'round',
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('1.4');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 1,
+      },
+    ]);
+  });
+
+  it('should respect multiple mending types', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'int',
+        name: 'a',
+        width: 3,
+        start: 0,
+      },
+      {
+        type: 'int',
+        name: 'b',
+        width: 3,
+        start: 3,
+        mend: 'floor',
+      },
+      {
+        type: 'int',
+        name: 'c',
+        width: 3,
+        start: 6,
+        mend: 'round',
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('1.41.41.4');
+
+    expect(actual).toStrictEqual([
+      {
+        a: 1,
+        b: 1,
+        c: 1,
+      },
+    ]);
+  });
+
+  it('should respect mending type of error', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'int',
+        name: 'a',
+        width: 3,
+        start: 0,
+        mend: 'error',
+      },
+    ]);
+
+    try {
+      fixedWidthParser.parse('1.1');
+    } catch (error) {
+      expect(error.message).toBeDefined();
+    }
+  });
+
   describe('options', () => {
     describe('falsyFallback', () => {
       describe('falsyFallback = passthrough', () => {

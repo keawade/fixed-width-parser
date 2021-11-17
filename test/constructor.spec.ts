@@ -109,6 +109,26 @@ describe('constructor', () => {
     }
   });
 
+  it('should throw an error there is a int value with a mend type not equal to error and a radix not equal to 10', () => {
+    try {
+      new FixedWidthParser([
+        {
+          name: 'Test',
+          width: 3,
+          start: 0,
+          type: 'int',
+          mend: 'ceil',
+          radix: 8,
+        },
+      ]);
+      fail('should have thrown an error');
+    } catch (err) {
+      expect(err.length).toBe(1);
+      expect(err[0].index).toBe(0);
+      expect(err[0].errors).toHaveLength(1);
+    }
+  });
+
   it('should throw an error if bool type not provided a trueValue', () => {
     try {
       new FixedWidthParser([

@@ -1,5 +1,6 @@
 import { ParseConfig, ParseConfigInput } from './interfaces/ParseConfig';
 import { JsonObject } from './interfaces/json';
+import { ILogger } from './interfaces/ILogger';
 import { IParseConfigValidationError } from './interfaces/IParseConfigValidationError';
 import { splice } from './splice';
 import { parse as parseToDate, isValid as isValidDate, format as formatDate } from 'date-fns';
@@ -28,7 +29,11 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
    * @param parseConfigMap Array of parse configs
    * @param options Additional options
    */
-  constructor(parseConfigMap: ParseConfigInput[], options?: IFixedWidthParserOptions) {
+  constructor(
+    parseConfigMap: ParseConfigInput[],
+    options?: IFixedWidthParserOptions,
+    private logger: ILogger = console,
+  ) {
     if (parseConfigMap.length <= 0) {
       throw new Error(`Invalid parse config! Parse config is empty!`);
     }
@@ -171,7 +176,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
             throw new Error(`Unable to parse value '${value}' into width of '${config.width}'!`);
           }
 
-          console.warn(
+          this.logger.warn(
             `Truncating value '${value}' to '${value.slice(0, config.width)}' to fit in '${
               config.name
             }' width of '${config.width}'.`,
@@ -256,7 +261,9 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
           return false;
         }
 
-        console.warn(`Failed to parse to boolean value. Falling back to ${options.falsyFallback}.`);
+        this.logger.warn(
+          `Failed to parse to boolean value. Falling back to ${options.falsyFallback}.`,
+        );
         return handleFalsyFallback(false, options.falsyFallback);
       }
 
@@ -267,7 +274,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
         }
 
         const failValue = handleFalsyFallback(null, options.falsyFallback);
-        console.warn(`Failed to parse to date value. Falling back to ${failValue}.`);
+        this.logger.warn(`Failed to parse to date value. Falling back to ${failValue}.`);
         return failValue;
       }
 

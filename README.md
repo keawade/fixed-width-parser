@@ -71,6 +71,8 @@ interface IParseOptions {
    * - `'undefined'` = `undefined`
    * - `'null'` = `null`
    * - `'passthrough'` = return the original falsy value
+   *
+   *  If the value is not defined the default behavior is to passthrough
    */
   falsyFallback: FalsyFallback;
 }
@@ -148,6 +150,7 @@ interface IBaseParseConfig {
   // overrides FixedWidthParser.defaults.truncate
   truncate?: boolean;
   // value to return if the parsed value is falsy
+  // this will override the more general behavior in parse options
   // default: IParseOptions.falsyFallback value
   falsyFallback?: 'undefined' | 'null' | 'passthrough'
 }

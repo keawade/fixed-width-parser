@@ -267,19 +267,22 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
         } else {
           value = parseInt(trimmedString, config.radix);
         }
-        return handleFalsyFallback(value, options.falsyFallback);
+        return handleFalsyFallback(value, config.falsyFallback ?? options.falsyFallback);
       }
 
       case 'float': {
         const decimalCount = config.decimalCount ?? 2;
         if (trimmedString.includes('.')) {
-          return handleFalsyFallback(Number(trimmedString), options.falsyFallback);
+          return handleFalsyFallback(
+            Number(trimmedString),
+            config.falsyFallback ?? options.falsyFallback,
+          );
         }
         // Pad to original field width with 0's to ensure decimal can be injected
         const stringToParse = trimmedString.padStart(config.width, '0');
         return handleFalsyFallback(
           Number(splice(stringToParse, '.', stringToParse.length - 1 - decimalCount)),
-          options.falsyFallback,
+          config.falsyFallback ?? options.falsyFallback,
         );
       }
 
@@ -294,7 +297,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
         this.logger.warn(
           `Failed to parse to boolean value. Falling back to ${options.falsyFallback}.`,
         );
-        return handleFalsyFallback(false, options.falsyFallback);
+        return handleFalsyFallback(false, config.falsyFallback ?? options.falsyFallback);
       }
 
       case 'date': {
@@ -303,7 +306,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
           return formatDate(parsedDate, config.jsonFormat);
         }
 
-        const failValue = handleFalsyFallback(null, options.falsyFallback);
+        const failValue = handleFalsyFallback(null, config.falsyFallback ?? options.falsyFallback);
         this.logger.warn(`Failed to parse to date value. Falling back to ${failValue}.`);
         return failValue;
       }
@@ -316,7 +319,7 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
       case 'string':
       default: {
         // TODO: Find a good way to warn of untrimmed values as they may indicate a misconfiguration
-        return handleFalsyFallback(trimmedString, options.falsyFallback);
+        return handleFalsyFallback(trimmedString, config.falsyFallback ?? options.falsyFallback);
       }
     }
   };

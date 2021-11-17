@@ -1,3 +1,5 @@
+import { FalsyFallback } from './IParseOptions';
+
 export type ParseConfigInput = ParseConfig | IBaseParseConfig;
 
 export type ParseConfig =
@@ -18,6 +20,7 @@ interface IBaseParseConfig {
   padChar?: string;
   default?: string | number;
   truncate?: boolean;
+  falsyFallback?: FalsyFallback;
 }
 
 export interface ISkipParseConfig extends IBaseParseConfig {

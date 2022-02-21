@@ -187,7 +187,9 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
         if (value.length > config.width) {
           // Prioritize config-level option over parser-level options
           if (!(config.truncate ?? this.defaults.truncate)) {
-            throw new Error(`Unable to parse value '${value}' into width of '${config.width}'!`);
+            throw new Error(
+              `Unable to parse value '${value}' into width of '${config.width}' for field '${config.name}'!`,
+            );
           }
 
           this.logger.warn(

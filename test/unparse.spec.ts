@@ -200,7 +200,9 @@ describe('FixedWidthParser.unparse', () => {
         fixedWidthParser.unparse([{ Name: 'Alexander' }]);
         fail('should have thrown error');
       } catch (err) {
-        expect(err.message).toBe("Unable to parse value 'Alexander' into width of '7'!");
+        expect(err.message).toBe(
+          "Unable to parse value 'Alexander' into width of '7' for field 'Name'!",
+        );
       }
     },
   );
@@ -250,7 +252,9 @@ describe('FixedWidthParser.unparse', () => {
       fixedWidthParser.unparse([{ Name: 'Alexander' }]);
       fail('should have thrown error');
     } catch (err) {
-      expect(err.message).toBe("Unable to parse value 'Alexander' into width of '7'!");
+      expect(err.message).toBe(
+        "Unable to parse value 'Alexander' into width of '7' for field 'Name'!",
+      );
     }
   });
 

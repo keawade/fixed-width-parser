@@ -5,8 +5,7 @@
 ![NPM](https://img.shields.io/npm/l/fixed-width-parser)
 ![Snyk Vulnerabilities for npm package version](https://img.shields.io/snyk/vulnerabilities/npm/fixed-width-parser)
 
-`fixed-width-parser` is a node module for parsing data to and from fixed width string
-formats.
+`fixed-width-parser` is a node module for parsing data to and from fixed width string formats.
 
 ## Install
 
@@ -125,9 +124,9 @@ const result = fixedWidthParser.unparse(input);
 
 ## Config
 
-When initializing a new instance of the `FixedWidthParser` class, you must provide
-an array of parse configs. These configs define how to convert between lines of
-text and json objects by providing a mapping between segments of text and object keys.
+When initializing a new instance of the `FixedWidthParser` class, you must provide an array of parse
+configs. These configs define how to convert between lines of text and json objects by providing a
+mapping between segments of text and object keys.
 
 All parse configs share the following properties:
 
@@ -156,9 +155,9 @@ interface IBaseParseConfig {
 }
 ```
 
-An explicit `type` property can be provided in each parse config to specify what
-data types to use for values parsed from strings. Several of these data types require
-additional properties to be provided to fully define how parse/unparse values.
+An explicit `type` property can be provided in each parse config to specify what data types to use
+for values parsed from strings. Several of these data types require additional properties to be
+provided to fully define how parse/unparse values.
 
 ```typescript
 // Default config type
@@ -246,9 +245,9 @@ interface ISkipParseConfig {
 
 ### Parse Config Validation
 
-When constructing a new `FixedWidthParser` instance the provided parse config will
-be validated. If any errors are detected an array of validation errors will be thrown
-to help you find and correct the invalid configs.
+When constructing a new `FixedWidthParser` instance the provided parse config will be validated. If
+any errors are detected an array of validation errors will be thrown to help you find and correct
+the invalid configs.
 
 ```typescript
 interface IParseConfigValidationError {
@@ -307,8 +306,8 @@ interface IFixedWidthParserOptions {
 
 ## Parser Logger
 
-By default any logs from the parser will be handled by the built in `console` logger.
-You can optionally provide your own `ILogger` compatible logger to process logs.
+By default any logs from the parser will be handled by the built in `console` logger. You can
+optionally provide your own `ILogger` compatible logger to process logs.
 
 ```typescript
 const { FixedWidthParser, ILogger } = require('fixed-width-parser');
@@ -338,10 +337,8 @@ const fixedWidthParser = new FixedWidthParser(
 
 ## Thanks
 
-A huge thanks to @SteveyPugs for his work on `fixy` which served as inspiration
-for `fixed-width-parser`! `fixed-width-parser` started out as a fork of `fixy` and
-evolved into its own library when I got carried away and implemented a new high-level
-API.
+A huge thanks to @SteveyPugs for his work on `fixy` which served as inspiration for
+`fixed-width-parser`! `fixed-width-parser` started out as a fork of `fixy` and evolved into its own
+library when I got carried away and implemented a new high-level API.
 
-Another huge thanks to @wk-davis for her help with concept discussions and ongoing
-development help!
+Another huge thanks to @wk-davis for her help with concept discussions and ongoing development help!

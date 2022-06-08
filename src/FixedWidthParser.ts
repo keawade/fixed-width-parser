@@ -308,7 +308,19 @@ export class FixedWidthParser<T extends JsonObject = JsonObject> {
           return formatDate(parsedDate, config.jsonFormat);
         }
 
-        const failValue = handleFalsyFallback(null, config.falsyFallback ?? options.falsyFallback);
+        if (config.tryParsingRawValueBeforeFallback) {
+          const parsedRawDate = parseToDate(rawString, config.fixedWidthFormat, new Date());
+          if (isValidDate(parsedRawDate)) {
+            return formatDate(parsedRawDate, config.jsonFormat);
+          }
+        }
+
+        let failValue: string | number | false;
+        if (config.falsyFallback === 'passthrough') {
+          failValue = trimmedString;
+        } else {
+          failValue = handleFalsyFallback(null, config.falsyFallback ?? options.falsyFallback);
+        }
         this.logger.warn(`Failed to parse to date value. Falling back to ${failValue}.`);
         return failValue;
       }

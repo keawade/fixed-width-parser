@@ -395,6 +395,36 @@ describe('FixedWidthParser.parse', () => {
     ]);
   });
 
+  it('should handle falsy fallback options', () => {
+    const fixedWidthParser = new FixedWidthParser([
+      {
+        type: 'date',
+        name: 'a',
+        width: 6,
+        start: 0,
+        padChar: '0',
+        falsyFallback: 'passthrough',
+        jsonFormat: 'HH:mm:ss',
+        fixedWidthFormat: 'HHmmss',
+        tryParsingRawValueBeforeFallback: true,
+      },
+    ]);
+
+    const actual = fixedWidthParser.parse('123000\n000bad\n030000');
+
+    expect(actual).toStrictEqual([
+      {
+        a: '12:30:00',
+      },
+      {
+        a: 'bad',
+      },
+      {
+        a: '03:00:00',
+      },
+    ]);
+  });
+
   it('should parse date segments with falsyFallback options', () => {
     const fixedWidthParser = new FixedWidthParser([
       {

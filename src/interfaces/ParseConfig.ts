@@ -51,6 +51,7 @@ export interface IDateParseConfig extends IBaseParseConfig {
   name: string;
   fixedWidthFormat: string;
   jsonFormat: string;
+  tryParsingRawValueBeforeFallback: boolean;
 }
 
 export interface IBooleanParseConfig extends IBaseParseConfig {

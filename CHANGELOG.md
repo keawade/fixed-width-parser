@@ -4,3 +4,4 @@
 
 - Updated `date-fns` dependency
 - Updated developer tooling
+- Drop Node 10 support

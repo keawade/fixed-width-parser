@@ -15,7 +15,7 @@ export class DateSegmentProcessor extends SegmentProcessor<IDateSegmentConfig> {
     const parsedDate = parseToDate(input, config.fixedWidthFormat, new Date());
 
     if (isValidDate(parsedDate)) {
-      return { [config.name]: formatDate(parsedDate, config.jsonFormat) };
+      return formatDate(parsedDate, config.jsonFormat);
     }
 
     // TODO: Falsy fallback? Not here though, think I want another processor method for it.
@@ -27,5 +27,10 @@ export class DateSegmentProcessor extends SegmentProcessor<IDateSegmentConfig> {
     if (isValidDate(parsedDate)) {
       return formatDate(parsedDate, config.fixedWidthFormat);
     }
+  }
+
+  public validateConfig(): boolean {
+    // TODO
+    return super.validateConfig() && true;
   }
 }

@@ -1,5 +1,6 @@
 import { ISegmentConfig } from '../interfaces/ISegmentConfig';
 import { SegmentProcessor } from './SegmentProcessor';
+import { StringSegmentProcessor } from './StringSegmentProcessor';
 
 export interface IIntegerSegmentConfig extends ISegmentConfig {
   type: 'integer';
@@ -13,14 +14,14 @@ export class IntegerSegmentProcessor extends SegmentProcessor<IIntegerSegmentCon
   public parse(input: string, config: Required<IIntegerSegmentConfig>) {
     switch (config.mend) {
       case 'ceil':
-        return { [config.name]: Math.ceil(parseFloat(input)) };
+        return Math.ceil(parseFloat(input));
       case 'round':
-        return { [config.name]: Math.round(parseFloat(input)) };
+        return Math.round(parseFloat(input));
       case 'error':
         throw new Error(`Expected parsed value for '${config.name}' to be an integer`);
       case 'floor':
       default:
-        return { [config.name]: parseInt(input) };
+        return parseInt(input);
     }
   }
 

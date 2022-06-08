@@ -12,11 +12,11 @@ export class BooleanSegmentProcessor extends SegmentProcessor<IBooleanSegmentCon
 
   public parse(input: string, config: Required<IBooleanSegmentConfig>) {
     if (input === config.trueValue) {
-      return { [config.name]: true };
+      return true;
     }
 
     if (input === config.falseValue) {
-      return { [config.name]: false };
+      return false;
     }
 
     // TODO: Falsy fallback? Not here though, think I want another processor method for it.

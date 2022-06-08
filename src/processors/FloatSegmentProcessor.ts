@@ -13,13 +13,11 @@ export class FloatSegmentProcessor extends SegmentProcessor<IFloatSegmentConfig>
   public parse(input: string, config: Required<IFloatSegmentConfig>) {
     const decimalCount = config.decimalCount ?? 2;
     if (input.includes('.')) {
-      return { [config.name]: Number(input) };
+      return Number(input);
     }
     // Pad to original field width with 0's to ensure decimal can be injected
     const stringToParse = input.padStart(config.width, '0');
-    return {
-      [config.name]: Number(splice(stringToParse, '.', stringToParse.length - 1 - decimalCount)),
-    };
+    return Number(splice(stringToParse, '.', stringToParse.length - 1 - decimalCount));
 
     // TODO: Falsy fallback? Not here though, think I want another processor method for it.
   }

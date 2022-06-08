@@ -11,18 +11,29 @@ import { StringSegmentProcessor } from './processors/StringSegmentProcessor';
 
 export class FixedWidthParser {
   // TODO: Find a better way to do this?
-  private processors: SegmentProcessor[] = [
-    new BooleanSegmentProcessor(),
-    new DateSegmentProcessor(),
-    new FloatSegmentProcessor(),
-    new IntegerSegmentProcessor(),
-    new StringSegmentProcessor(),
-    new SkipSegmentProcessor(),
-  ];
+  private processors: Map<string, SegmentProcessor> = new Map();
+
   private lineConfig: (IUniqueConfig & IDefaultableConfig)[];
 
-  // TODO: Could be better to set custom processors on construction rather than after with `.use()`
-  public constructor(lineConfig: ILineConfig) {
+  public constructor(lineConfig: ILineConfig, customProcessors: SegmentProcessor[] = []) {
+    this.processors.set('boolean', new BooleanSegmentProcessor());
+    this.processors.set('date', new DateSegmentProcessor());
+    this.processors.set('float', new FloatSegmentProcessor());
+    this.processors.set('integer', new IntegerSegmentProcessor());
+    this.processors.set('string', new StringSegmentProcessor());
+    this.processors.set('skip', new SkipSegmentProcessor());
+
+    customProcessors.forEach((customProcessor) =>
+      this.processors.set(customProcessor.type, customProcessor),
+    );
+
+    // Validation
+    lineConfig.map((config) => {
+      const processor = this.processors.get(config.type);
+      // TODO: handle errors
+      processor.validateConfig();
+    });
+
     this.lineConfig = this.applySegmentConfigDefaults(lineConfig);
   }
 
@@ -30,7 +41,7 @@ export class FixedWidthParser {
     lineConfig: ILineConfig,
   ): (IUniqueConfig & IDefaultableConfig)[] {
     return lineConfig.map((segmentConfig) => {
-      const segmentParser = this.processors.find((parser) => parser.type === segmentConfig.type);
+      const segmentParser = this.processors.get(segmentConfig.type);
 
       if (segmentParser === undefined) {
         throw new Error(
@@ -40,10 +51,6 @@ export class FixedWidthParser {
 
       return merge({}, segmentParser.defaultSegmentConfig, segmentConfig);
     });
-  }
-
-  public use(processor: SegmentProcessor): void {
-    this.processors.push(processor);
   }
 
   public parse(input: string): { [key: string]: any }[] {
@@ -72,7 +79,7 @@ export class FixedWidthParser {
       .reduce(
         (accumulator, segmentWithConfig) => ({
           ...accumulator,
-          ...this.parseLineSegment(
+          [segmentWithConfig.segmentProcessorConfig.name]: this.parseLineSegment(
             segmentWithConfig.segment,
             segmentWithConfig.segmentProcessorConfig,
           ),
@@ -86,11 +93,11 @@ export class FixedWidthParser {
     segmentConfig: Required<ISegmentConfig>,
   ): { [key: string]: any } {
     // Find our parser
-    const segmentParser = this.processors.find((parser) => parser.type === segmentConfig.type);
+    const segmentProcessor = this.processors.get(segmentConfig.type);
 
-    const trimmedInput = segmentParser.trim(input, segmentConfig);
+    const trimmedInput = segmentProcessor.trim(input, segmentConfig);
 
-    const output = segmentParser.parse(trimmedInput, segmentConfig);
+    const output = segmentProcessor.parse(trimmedInput, segmentConfig);
 
     return output;
   }

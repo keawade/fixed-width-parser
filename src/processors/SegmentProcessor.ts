@@ -7,13 +7,14 @@ import { ISegmentConfig, IDefaultableConfig } from '../interfaces/ISegmentConfig
  */
 export abstract class SegmentProcessor<T extends ISegmentConfig = ISegmentConfig> {
   public abstract type: T['type'];
+
   /**
    * Method to parse input
    *
    * @param input Trimmed input
    * @param config
    */
-  public abstract parse(input: string, config: Required<T>): { [key: string]: any };
+  public abstract parse(input: string, config: Required<T>): any;
 
   /**
    * Method to format input to fixed width string output
@@ -43,7 +44,7 @@ export abstract class SegmentProcessor<T extends ISegmentConfig = ISegmentConfig
    * @returns Trimmed string
    */
   public trim(input: string, config: Required<T>): string {
-    if (config.padding.trim) {
+    if (config.padding.trim === true) {
       if (config.padding.direction === 'start') {
         return trimStart(input, config.padding.character);
       }
@@ -67,5 +68,16 @@ export abstract class SegmentProcessor<T extends ISegmentConfig = ISegmentConfig
     }
 
     return input.padEnd(config.width, config.padding.character);
+  }
+
+  // TODO
+  public validateConfig(): boolean {
+    // padding: {
+    //   character: ' ',
+    //   direction: 'start',
+    //   trim: true,
+    // },
+
+    return true;
   }
 }

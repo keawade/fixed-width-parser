@@ -8,8 +8,8 @@ export interface IStringSegmentConfig extends ISegmentConfig {
 export class StringSegmentProcessor extends SegmentProcessor<IStringSegmentConfig> {
   public type = 'string' as const;
 
-  public parse(input: string, config: Required<IStringSegmentConfig>) {
-    return { [config.name]: input };
+  public parse(input: string) {
+    return input;
   }
 
   public format(input: { [key: string]: any }[], config: Required<IStringSegmentConfig>): string {

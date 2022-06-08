@@ -220,6 +220,7 @@ interface IDateParseConfig {
   // unicode date field symbol pattern
   jsonFormat: string;
   // attempt to parse raw value before failing if trimmed value is not parsable as a Date
+  // default: false
   tryParsingRawValueBeforeFallback: boolean;
 }
 ```

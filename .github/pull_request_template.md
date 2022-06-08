@@ -6,3 +6,4 @@
 
 - [ ] Version has been bumped
 - [ ] Documentation has been updated
+- [ ] Changelog has been updated

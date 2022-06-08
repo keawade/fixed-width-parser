@@ -1,84 +1,36 @@
-// interface IParser {
-//   type: string;
-//   parse(input: string): { [key: string]: any };
-//   format(input: { [key: string]: any }[]): string;
-//   defaultSegmentConfig: IDefaultableConfig;
-// }
-
-export abstract class Parser<T extends ISegmentConfig = ISegmentConfig> {
-  public abstract type: T['type'];
-  public abstract parse(input: string, config: T): { [key: string]: any };
-  public abstract format(input: { [key: string]: any }[], config: T): string;
-  public abstract defaultSegmentConfig: IDefaultableConfig;
-}
-
-interface IDefaultableConfig {
-  padChar: string;
-}
-
-interface IUniqueConfig {
-  type: string;
-  name: string;
-  start: number;
-  width: number;
-}
-
-type ILineConfig = ISegmentConfig[];
-type ISegmentConfig = IUniqueConfig & Partial<IDefaultableConfig>;
-
-interface IStringSegmentConfig extends ISegmentConfig {
-  type: 'string';
-}
-
-class StringParser extends Parser<IStringSegmentConfig> {
-  public type = 'string' as const;
-
-  public parse(input: string, config: IStringSegmentConfig) {
-    return { [config.name]: input };
-  }
-
-  public format(input: { [key: string]: any }[], config: IStringSegmentConfig): string {
-    return `${input[config.name]}`;
-  }
-
-  public defaultSegmentConfig = {
-    padChar: ' ',
-  };
-}
-
-interface ISkipSegmentConfig extends ISegmentConfig {
-  type: 'skip';
-}
-
-class SkipParser extends Parser<ISkipSegmentConfig> {
-  public type = 'skip' as const;
-
-  public parse() {
-    return {};
-  }
-
-  public format(input: { [key: string]: any }[], config: ISkipSegmentConfig): string {
-    return ''; // TODO: Maybe here? Probably in padding tooling
-  }
-
-  public defaultSegmentConfig = {
-    padChar: ' ',
-  };
-}
+import merge from 'lodash.merge';
+import { ILineConfig } from './interfaces/ILineConfig';
+import { ISegmentConfig, IUniqueConfig, IDefaultableConfig } from './interfaces/ISegmentConfig';
+import { IntegerSegmentProcessor } from './processors';
+import { BooleanSegmentProcessor } from './processors/BooleanSegmentProcessor';
+import { DateSegmentProcessor } from './processors/DateSegmentProcessor';
+import { FloatSegmentProcessor } from './processors/FloatSegmentProcessor';
+import { SegmentProcessor } from './processors/SegmentProcessor';
+import { SkipSegmentProcessor } from './processors/SkipSegmentProcessor';
+import { StringSegmentProcessor } from './processors/StringSegmentProcessor';
 
 export class FixedWidthParser {
-  private parsers: Parser[] = [new StringParser(), new SkipParser()];
+  // TODO: Find a better way to do this?
+  private processors: SegmentProcessor[] = [
+    new BooleanSegmentProcessor(),
+    new DateSegmentProcessor(),
+    new FloatSegmentProcessor(),
+    new IntegerSegmentProcessor(),
+    new StringSegmentProcessor(),
+    new SkipSegmentProcessor(),
+  ];
   private lineConfig: (IUniqueConfig & IDefaultableConfig)[];
 
+  // TODO: Could be better to set custom processors on construction rather than after with `.use()`
   public constructor(lineConfig: ILineConfig) {
-    this.lineConfig = this.applySegementConfigDefaults(lineConfig);
+    this.lineConfig = this.applySegmentConfigDefaults(lineConfig);
   }
 
-  private applySegementConfigDefaults(
+  private applySegmentConfigDefaults(
     lineConfig: ILineConfig,
   ): (IUniqueConfig & IDefaultableConfig)[] {
     return lineConfig.map((segmentConfig) => {
-      const segmentParser = this.parsers.find((parser) => parser.type === segmentConfig.type);
+      const segmentParser = this.processors.find((parser) => parser.type === segmentConfig.type);
 
       if (segmentParser === undefined) {
         throw new Error(
@@ -86,16 +38,13 @@ export class FixedWidthParser {
         );
       }
 
-      return {
-        ...segmentParser.defaultSegmentConfig,
-        ...segmentConfig,
-      };
+      return merge({}, segmentParser.defaultSegmentConfig, segmentConfig);
     });
   }
 
-  // public use(parser: Parser): void {
-  //   this.parsers.push(new parser());
-  // }
+  public use(processor: SegmentProcessor): void {
+    this.processors.push(processor);
+  }
 
   public parse(input: string): { [key: string]: any }[] {
     if (!input) {
@@ -111,7 +60,38 @@ export class FixedWidthParser {
     return lines.map((line) => this.parseLine(line));
   }
 
-  private parseLine(input: string): { [key: string]: any } {
-    return {};
+  private parseLine(line: string): { [key: string]: any } {
+    return this.lineConfig
+      .map((segmentProcessorConfig) => ({
+        segmentProcessorConfig,
+        segment: line.slice(
+          segmentProcessorConfig.start,
+          segmentProcessorConfig.start + segmentProcessorConfig.width,
+        ),
+      }))
+      .reduce(
+        (accumulator, segmentWithConfig) => ({
+          ...accumulator,
+          ...this.parseLineSegment(
+            segmentWithConfig.segment,
+            segmentWithConfig.segmentProcessorConfig,
+          ),
+        }),
+        {} as { [key: string]: any },
+      );
+  }
+
+  private parseLineSegment(
+    input: string,
+    segmentConfig: Required<ISegmentConfig>,
+  ): { [key: string]: any } {
+    // Find our parser
+    const segmentParser = this.processors.find((parser) => parser.type === segmentConfig.type);
+
+    const trimmedInput = segmentParser.trim(input, segmentConfig);
+
+    const output = segmentParser.parse(trimmedInput, segmentConfig);
+
+    return output;
   }
 }

@@ -1,6 +1,3 @@
-import { FixedWidthParser } from './FixedWidthParser.old';
-
-export { FixedWidthParser } from './FixedWidthParser.old';
-export default FixedWidthParser;
-export * from './interfaces/ParseConfig';
-export * from './interfaces/ILogger';
+export { FixedWidthFormatter } from './FixedWidthFormatter';
+export { FixedWidthParser } from './FixedWidthParser';
+export * from './processors';

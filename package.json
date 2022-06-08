@@ -21,10 +21,16 @@
   },
   "homepage": "https://github.com/keawade/fixed-width-parser",
   "dependencies": {
-    "date-fns": "^2.28.0"
+    "date-fns": "^2.28.0",
+    "lodash.merge": "^4.6.2",
+    "lodash.trimend": "^4.5.1",
+    "lodash.trimstart": "^4.5.1"
   },
   "devDependencies": {
     "@types/jest": "^28.1.1",
+    "@types/lodash.merge": "^4.6.7",
+    "@types/lodash.trimend": "^4.5.7",
+    "@types/lodash.trimstart": "^4.5.7",
     "@types/node": "^16.11.39",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",

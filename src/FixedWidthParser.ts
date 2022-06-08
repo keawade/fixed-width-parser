@@ -1,13 +1,15 @@
 import merge from 'lodash.merge';
 import { ILineConfig } from './interfaces/ILineConfig';
 import { ISegmentConfig, IUniqueConfig, IDefaultableConfig } from './interfaces/ISegmentConfig';
-import { IntegerSegmentProcessor } from './processors';
-import { BooleanSegmentProcessor } from './processors/BooleanSegmentProcessor';
-import { DateSegmentProcessor } from './processors/DateSegmentProcessor';
-import { FloatSegmentProcessor } from './processors/FloatSegmentProcessor';
-import { SegmentProcessor } from './processors/SegmentProcessor';
-import { SkipSegmentProcessor } from './processors/SkipSegmentProcessor';
-import { StringSegmentProcessor } from './processors/StringSegmentProcessor';
+import {
+  SegmentProcessor,
+  BooleanSegmentProcessor,
+  DateSegmentProcessor,
+  FloatSegmentProcessor,
+  IntegerSegmentProcessor,
+  SkipSegmentProcessor,
+  StringSegmentProcessor,
+} from './processors';
 
 export class FixedWidthParser {
   // TODO: Find a better way to do this?
@@ -16,6 +18,7 @@ export class FixedWidthParser {
   private lineConfig: (IUniqueConfig & IDefaultableConfig)[];
 
   public constructor(lineConfig: ILineConfig, customProcessors: SegmentProcessor[] = []) {
+    // Register core processors
     this.processors.set('boolean', new BooleanSegmentProcessor());
     this.processors.set('date', new DateSegmentProcessor());
     this.processors.set('float', new FloatSegmentProcessor());
@@ -23,17 +26,12 @@ export class FixedWidthParser {
     this.processors.set('string', new StringSegmentProcessor());
     this.processors.set('skip', new SkipSegmentProcessor());
 
+    // Register custom processors
     customProcessors.forEach((customProcessor) =>
       this.processors.set(customProcessor.type, customProcessor),
     );
 
-    // Validation
-    lineConfig.map((config) => {
-      const processor = this.processors.get(config.type);
-      // TODO: handle errors
-      processor.validateConfig();
-    });
-
+    // Merge provided configs and default configs, validate resulting full config
     this.lineConfig = this.applySegmentConfigDefaults(lineConfig);
   }
 
@@ -49,7 +47,14 @@ export class FixedWidthParser {
         );
       }
 
-      return merge({}, segmentParser.defaultSegmentConfig, segmentConfig);
+      const config = merge({}, segmentParser.defaultSegmentConfig, segmentConfig);
+
+      // TODO: Collect errors instead of throwing directly
+      if (!this.processors.get(config.type).validateConfig(config)) {
+        throw new Error('Invalid config');
+      }
+
+      return config;
     });
   }
 

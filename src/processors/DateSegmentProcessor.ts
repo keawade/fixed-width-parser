@@ -29,8 +29,8 @@ export class DateSegmentProcessor extends SegmentProcessor<IDateSegmentConfig> {
     }
   }
 
-  public validateConfig(): boolean {
+  public validateConfig(config: Required<IDateSegmentConfig>): boolean {
     // TODO
-    return super.validateConfig() && true;
+    return super.validateConfig(config) && true;
   }
 }

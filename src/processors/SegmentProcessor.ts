@@ -71,7 +71,7 @@ export abstract class SegmentProcessor<T extends ISegmentConfig = ISegmentConfig
   }
 
   // TODO
-  public validateConfig(): boolean {
+  public validateConfig(config: Required<T>): boolean {
     // padding: {
     //   character: ' ',
     //   direction: 'start',

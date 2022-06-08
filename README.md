@@ -152,7 +152,7 @@ interface IBaseParseConfig {
   // value to return if the parsed value is falsy
   // this will override the more general behavior in parse options
   // default: IParseOptions.falsyFallback value
-  falsyFallback?: 'undefined' | 'null' | 'passthrough'
+  falsyFallback?: 'undefined' | 'null' | 'passthrough';
 }
 ```
 
@@ -188,7 +188,7 @@ interface IIntegerParseConfig {
   // round: performs Math.round() on the data
   // error: Will throw an error if the data is not an int
   // default: floor
-  mend?: 'ceil' | 'floor' | 'round' | 'error'
+  mend?: 'ceil' | 'floor' | 'round' | 'error';
 }
 ```
 

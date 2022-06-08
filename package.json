@@ -21,23 +21,22 @@
   },
   "homepage": "https://github.com/keawade/fixed-width-parser",
   "dependencies": {
-    "date-fns": "^2.14.0"
+    "date-fns": "^2.28.0"
   },
   "devDependencies": {
-    "@types/date-fns": "^2.6.0",
-    "@types/jest": "^26.0.3",
-    "@types/node": "^14.0.14",
-    "@typescript-eslint/eslint-plugin": "^3.4.0",
-    "@typescript-eslint/parser": "^3.4.0",
-    "eslint": "^7.3.1",
-    "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.21.2",
-    "husky": "^7.0.4",
-    "jest": "^26.1.0",
-    "prettier": "^2.0.5",
-    "ts-jest": "^26.1.1",
-    "typescript": "^3.9.5"
+    "@types/jest": "^28.1.1",
+    "@types/node": "^16.11.39",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
+    "eslint": "^8.17.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "husky": "^8.0.1",
+    "jest": "^28.1.1",
+    "prettier": "^2.6.2",
+    "ts-jest": "^28.0.4",
+    "typescript": "^4.7.3"
   },
   "scripts": {
     "build": "tsc",
@@ -45,12 +44,15 @@
     "prepublishOnly": "npm run build",
     "test": "jest --coverage",
     "test:watch": "npm run test -- --watch",
-    "check": "npm run check:lint && npm run check:prettier && npm run check:build",
+    "check": "npm run check:eslint && npm run check:prettier && npm run check:build",
     "check:build": "tsc --noEmit",
-    "check:lint": "eslint src/** test/**",
-    "check:prettier": "prettier \"{.,,{src,test}/**/}*.@(ts)\" --list-different",
+    "check:eslint": "eslint src/** test/**",
+    "check:prettier": "prettier . --list-different",
     "husky:pre-commit": "npm run check",
     "husky:pre-push": "npm run test",
+    "fix": "npm run fix:prettier && npm run fix:eslint",
+    "fix:eslint": "npm run check:eslint -- --fix",
+    "fix:prettier": "npm run check:prettier -- --write",
     "prepare": "husky install"
   },
   "keywords": [
